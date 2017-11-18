@@ -138,7 +138,14 @@ void FontDrawCharUnaligned( struct SSD1306_Device* DeviceHandle, char c, int x, 
     for ( x2 = 0; x2 < CharWidth; x2++ ) {
         for ( y2 = 0; y2 < Font->Height; y2++ ) {
             for ( i = 7; i >= 0; i-- ) {
-                SSD1306_DrawPixel( DeviceHandle, x + x2, y + ( i + ( y2 * 8 ) ), ( ( *FontOffset & BIT( i ) ) && Color == true ) ? true : false );
+                //SSD1306_DrawPixel( DeviceHandle, x + x2, y + ( i + ( y2 * 8 ) ), ( ( *FontOffset & BIT( i ) ) && Color == true ) ? true : false );
+                if ( *FontOffset & BIT( i ) ) {
+                    SSD1306_DrawPixel( DeviceHandle,
+                        x + x2,
+                        y + ( i + ( y2 * 8 ) ),
+                        Color
+                    ); 
+                }
             }
 
             FontOffset++;
