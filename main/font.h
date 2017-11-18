@@ -23,9 +23,9 @@ typedef enum {
     TextAnchor_Center
 } TextAnchor;
 
-extern struct FontDef Font_Comic_Sans_MS_12x16;
-extern struct FontDef Font_Impact_13x16;
-extern struct FontDef Font_Terminal_8x12;
+extern struct FontDef Font_Ubuntu_Mono_6x10;
+extern struct FontDef Font_Liberation_Sans_15x16;
+extern struct FontDef Font_Liberation_Serif_19x19;
 
 struct SSD1306_Device;
 

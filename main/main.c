@@ -347,11 +347,9 @@ void app_main( void ) {
             printf( "SSD1306 Init OK.\n" );
 
             /* SSD1306_SetInverted( &TestDevice, true ); */
-            SSD1306_SetFont( &TestDevice, &Font_Terminal_8x12 );
-            /*
-            SSD1306_SetFont( &TestDevice, &Font_Comic_Sans_MS_12x16 );
-            SSD1306_SetFont( &TestDevice, &Font_Impact_13x16 );
-            */
+            /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Sans_15x16 ); */
+            /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Serif_19x19 ); */
+            SSD1306_SetFont( &TestDevice, &Font_Ubuntu_Mono_6x10 );
 
             FontDrawAnchoredString( &TestDevice, "NE", TextAnchor_NorthEast, true );
             FontDrawAnchoredString( &TestDevice, "NW", TextAnchor_NorthWest, true );
