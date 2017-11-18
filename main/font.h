@@ -26,6 +26,7 @@ typedef enum {
 extern struct FontDef Font_Ubuntu_Mono_6x10;
 extern struct FontDef Font_Liberation_Sans_15x16;
 extern struct FontDef Font_Liberation_Serif_19x19;
+extern struct FontDef Font_Comic_Neue_25x28;
 
 struct SSD1306_Device;
 
