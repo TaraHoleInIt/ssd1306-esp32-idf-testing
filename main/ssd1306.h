@@ -53,11 +53,6 @@ typedef enum {
     SSD1306_IFACE_SPI
 } SSD1306_Interface;
 
-/*
-typedef void ( *SSD1306_WriteCommandFn ) ( SSD1306_Device* DeviceHandle, SSDCmd Command );
-typedef void ( *SSD1306_WriteDataFn ) ( SSD1306_Device* DeviceHandle, uint8_t* Data, size_t Length );
-*/
-
 struct FontDef;
 
 struct SSD1306_Device {
@@ -77,10 +72,6 @@ struct SSD1306_Device {
 
     uint8_t* Framebuffer;
     int FramebufferSize;
-/*
-    SSD1306_WriteCommandFn WriteCommand;
-    SSD1306_WriteDataFn WriteData;
-*/
 
     struct FontDef* Font;
 };

@@ -212,9 +212,6 @@ void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_
     NullCheck( DeviceHandle, return );
     NullCheck( DeviceHandle->Framebuffer, return );
 
-    //CheckBounds( X, 0, DeviceHandle->Width - 1, return );
-    //CheckBounds( Y, 0, DeviceHandle->Height - 1, return );
-
     /* 
      * We only need to modify the Y coordinate since the pitch
      * of the screen is the same as the width.
@@ -348,8 +345,8 @@ void app_main( void ) {
 
             /* SSD1306_SetInverted( &TestDevice, true ); */
             /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Sans_15x16 ); */
-            /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Serif_19x19 ); */
-            SSD1306_SetFont( &TestDevice, &Font_Ubuntu_Mono_6x10 );
+            SSD1306_SetFont( &TestDevice, &Font_Liberation_Serif_19x19 );
+            /* SSD1306_SetFont( &TestDevice, &Font_Ubuntu_Mono_6x10 ); */
 
             FontDrawAnchoredString( &TestDevice, "NE", TextAnchor_NorthEast, true );
             FontDrawAnchoredString( &TestDevice, "NW", TextAnchor_NorthWest, true );
