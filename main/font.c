@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
-#include <esp_timer.h>
 
 #include "ssd1306.h"
 #include "font.h"

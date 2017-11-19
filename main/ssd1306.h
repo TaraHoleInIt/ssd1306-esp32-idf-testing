@@ -1,6 +1,12 @@
 #ifndef _SSD1306_H_
 #define _SSD1306_H_
 
+/* For uint(X)_t */
+#include <stdint.h>
+
+/* For booooool */
+#include <stdbool.h>
+
 #define SSD1306_Max_Framebuffer_Size ( ( 128 * 64 ) / 8 )
 
 #ifndef BIT
@@ -50,12 +56,11 @@ typedef enum {
     AddressMode_Invalid
 } SSD1306_AddressMode;
 
-typedef enum {
-    SSD1306_IFACE_I2C = 1,
-    SSD1306_IFACE_SPI
-} SSD1306_Interface;
-
+struct SSD1306_Device;
 struct FontDef;
+
+typedef int ( *WriteCommandProc ) ( struct SSD1306_Device* DeviceHandle, SSDCmd Command );
+typedef int ( *WriteDataProc ) ( struct SSD1306_Device* DeviceHandle, uint8_t* Data, size_t DataLength );
 
 struct SSD1306_Device {
     /* I2C Specific */
@@ -67,7 +72,6 @@ struct SSD1306_Device {
     int DCPin;
 
     /* Everything else */
-    int Interface;
     int Width;
     int Height;
     int Pitch;
@@ -76,6 +80,9 @@ struct SSD1306_Device {
     int FramebufferSize;
 
     struct FontDef* Font;
+
+    WriteCommandProc WriteCommand;
+    WriteDataProc WriteData;
 };
 
 void SSD1306_SetMuxRatio( struct SSD1306_Device* DeviceHandle, uint8_t Ratio );
@@ -98,5 +105,8 @@ void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x
 void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y2, bool Color );
 void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, int y2, bool Color );
 void SSD1306_SetFont( struct SSD1306_Device* DeviceHandle, struct FontDef* FontHandle );
+
+int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height, int I2CAddress, WriteCommandProc WriteCommand, WriteDataProc WriteData );
+
 
 #endif
