@@ -178,14 +178,11 @@ void SSD1306_SetDisplayAddressMode( struct SSD1306_Device* DeviceHandle, SSD1306
 
 void SSD1306_Update( struct SSD1306_Device* DeviceHandle ) {
     NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer , return );
-
     SSD1306_WriteData_I2C( DeviceHandle, DeviceHandle->Framebuffer, DeviceHandle->FramebufferSize );
 }
 
 void SSD1306_WriteRawData( struct SSD1306_Device* DeviceHandle, uint8_t* Data, size_t DataLength ) {
     NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
     NullCheck( Data, return );
 
     DataLength = DataLength > DeviceHandle->FramebufferSize ? DeviceHandle->FramebufferSize : DataLength;
@@ -210,7 +207,6 @@ void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_
     uint8_t* FBOffset = NULL;
 
     NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
 
     /* 
      * We only need to modify the Y coordinate since the pitch
@@ -226,7 +222,6 @@ void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_
 
 void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, bool Color ) {
     NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
 
     CheckBounds( x >= DeviceHandle->Width, return );
     CheckBounds( ( x2 + x ) >= DeviceHandle->Width, return );
@@ -239,7 +234,6 @@ void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x
 
 void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y2, bool Color ) {
     NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
 
     CheckBounds( x >= DeviceHandle->Width, return );
     CheckBounds( y >= DeviceHandle->Height, return );
@@ -252,7 +246,6 @@ void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y
 
 void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, int y2, bool Color ) {
     NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
 
     CheckBounds( x >= DeviceHandle->Width, return );
     CheckBounds( ( x2 + x ) >= DeviceHandle->Width, return );
@@ -284,12 +277,6 @@ int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Address, int Widt
     DeviceHandle->Width = Width;
     DeviceHandle->Height = Height;
     DeviceHandle->FramebufferSize = ( DeviceHandle->Width * Height ) / 8;
-    DeviceHandle->Framebuffer = ( uint8_t* ) malloc( DeviceHandle->FramebufferSize );
-
-    if ( DeviceHandle->Framebuffer == NULL ) {
-        printf( "SSD1306: Failed to allocate %d bytes for a local framebuffer.\n", DeviceHandle->FramebufferSize );
-        return 0;
-    }
 
     memset( DeviceHandle->Framebuffer, 0, DeviceHandle->FramebufferSize );
 
@@ -345,9 +332,11 @@ void app_main( void ) {
 
             /* SSD1306_SetInverted( &TestDevice, true ); */
             /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Sans_15x16 ); */
-            SSD1306_SetFont( &TestDevice, &Font_Liberation_Serif_19x19 );
+            /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Serif_19x19 ); */
             /* SSD1306_SetFont( &TestDevice, &Font_Ubuntu_Mono_6x10 ); */
+            SSD1306_SetFont( &TestDevice, &Font_Comic_Neue_25x28 );
 
+            /*
             FontDrawAnchoredString( &TestDevice, "NE", TextAnchor_NorthEast, true );
             FontDrawAnchoredString( &TestDevice, "NW", TextAnchor_NorthWest, true );
             FontDrawAnchoredString( &TestDevice, "N", TextAnchor_North, true );
@@ -357,6 +346,9 @@ void app_main( void ) {
             FontDrawAnchoredString( &TestDevice, "SW", TextAnchor_SouthWest, true );
             FontDrawAnchoredString( &TestDevice, "S", TextAnchor_South, true );
             FontDrawAnchoredString( &TestDevice, "C", TextAnchor_Center, true );
+            */
+
+            FontDrawAnchoredString( &TestDevice, "Smile!", TextAnchor_Center, true );
 
             SSD1306_Update( &TestDevice );                                  
         }

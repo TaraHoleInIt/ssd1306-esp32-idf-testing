@@ -1,6 +1,8 @@
 #ifndef _SSD1306_H_
 #define _SSD1306_H_
 
+#define SSD1306_Max_Framebuffer_Size ( ( 128 * 64 ) / 8 )
+
 #ifndef BIT
 #define BIT( n ) ( 1 << n )
 #endif
@@ -70,7 +72,7 @@ struct SSD1306_Device {
     int Height;
     int Pitch;
 
-    uint8_t* Framebuffer;
+    uint8_t Framebuffer[ SSD1306_Max_Framebuffer_Size ];
     int FramebufferSize;
 
     struct FontDef* Font;
