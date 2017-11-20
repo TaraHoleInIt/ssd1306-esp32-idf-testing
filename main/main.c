@@ -35,6 +35,60 @@ int InitI2CMaster( int SDA, int SCL ) {
     return 0;
 }
 
+void FBShiftLeft( struct SSD1306_Device* DeviceHandle, uint8_t* ShiftIn, uint8_t* ShiftOut ) {
+    uint8_t* Framebuffer = NULL;
+    int Width = 0;
+    int Height = 0;
+    int y = 0;
+    int x = 0;
+
+    NullCheck( DeviceHandle, return );
+
+    Framebuffer = DeviceHandle->Framebuffer;
+    Width = DeviceHandle->Width;
+    Height = DeviceHandle->Height;
+
+    /* Clear out the first and last rows */
+    for ( y = 0; y < ( Width / 8 ); y++ ) {
+        /* Copy the column to be destroyed out if a buffer was passed in to hold it */
+        if ( ShiftOut != NULL ) {
+            ShiftOut[ y ] = Framebuffer[ y * Width ];
+        }
+
+        Framebuffer[ y * Width ] = 0;
+
+        /* If the caller passes a buffer of pixels it wants shifted in, use that instead of clearing it */
+        Framebuffer[ ( y * Width ) + ( Width - 1 ) ] = ( ShiftIn != NULL ) ? ShiftIn[ y ] : 0;
+    }
+
+    for ( x = 0; x < ( Width - 1 ); x++ ) {
+        for ( y = 0; y < ( Height / 8 ); y++ ) {
+            Framebuffer[ x + ( y * Width ) ] = Framebuffer[ 1 + x + ( y * Width ) ]; 
+        }
+    }
+}
+
+void ShiftTask( void* Param ) {
+    uint8_t Out[ 8 ];
+    uint8_t In[ 8 ];
+    int i = 0;
+
+    memset( Out, 0, sizeof( Out ) );
+    memset( In, 0, sizeof( In ) );
+
+    while ( true ) {
+        FBShiftLeft( &TestDevice, In, Out );
+
+        for ( i = 0; i < 8; i++ ) {
+            In[ i ] = Out[ i ];
+        }
+
+        SSD1306_Update( &TestDevice );
+
+        vTaskDelay( 16 / portTICK_PERIOD_MS );
+    }
+}
+
 void app_main( void ) {
     printf( "Ready...\n" );
 
@@ -65,7 +119,9 @@ void app_main( void ) {
             FontDrawAnchoredString( &TestDevice, "Smile!", TextAnchor_North, true );
             FontDrawAnchoredString( &TestDevice, "Okay.", TextAnchor_South, true );
 
-            SSD1306_Update( &TestDevice );                                  
+            SSD1306_Update( &TestDevice );     
+
+            xTaskCreate( ShiftTask, "ShiftTask", 4096, NULL, 5, NULL );                             
         }
     }
 }
