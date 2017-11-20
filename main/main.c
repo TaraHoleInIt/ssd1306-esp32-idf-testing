@@ -61,6 +61,7 @@ void FBShiftLeft( struct SSD1306_Device* DeviceHandle, uint8_t* ShiftIn, uint8_t
         Framebuffer[ ( y * Width ) + ( Width - 1 ) ] = ( ShiftIn != NULL ) ? ShiftIn[ y ] : 0;
     }
 
+    /* Shift every column of pixels one column to the left */
     for ( x = 0; x < ( Width - 1 ); x++ ) {
         for ( y = 0; y < ( Height / 8 ); y++ ) {
             Framebuffer[ x + ( y * Width ) ] = Framebuffer[ 1 + x + ( y * Width ) ]; 
@@ -68,24 +69,37 @@ void FBShiftLeft( struct SSD1306_Device* DeviceHandle, uint8_t* ShiftIn, uint8_t
     }
 }
 
-void ShiftTask( void* Param ) {
-    uint8_t Out[ 8 ];
-    uint8_t In[ 8 ];
-    int i = 0;
+void DrawPixelInColumn( uint8_t* Column, int y, bool Color ) {
+    uint32_t Pixel = ( y & 0x07 );
+    uint32_t Page = ( y >> 3 );
 
-    memset( Out, 0, sizeof( Out ) );
-    memset( In, 0, sizeof( In ) );
+    NullCheck( Column, return );
+
+    Column[ Page ] = ( Color == true ) ? Column[ Page ] | BIT( Pixel ) : Column[ Page ] & ~BIT( Pixel );
+}
+
+void ShiftTask( void* Param ) {
+    uint8_t In[ 8 ];
+    int dy = 1;
+    int y = 0;
 
     while ( true ) {
-        FBShiftLeft( &TestDevice, In, Out );
+        memset( In, 0, sizeof( In ) );
 
-        for ( i = 0; i < 8; i++ ) {
-            In[ i ] = Out[ i ];
+        y+= dy;
+
+        if ( y >= 63 ) {
+            dy = -1;
+        } else if ( y <= 0 ) {
+            dy = 1;
         }
 
+        DrawPixelInColumn( In, y, true );
+
+        FBShiftLeft( &TestDevice, In, NULL );
         SSD1306_Update( &TestDevice );
 
-        vTaskDelay( 16 / portTICK_PERIOD_MS );
+        vTaskDelay( 50 / portTICK_PERIOD_MS );
     }
 }
 
