@@ -87,6 +87,9 @@ struct SSD1306_Device {
 
     WriteCommandProc WriteCommand;
     WriteDataProc WriteData;
+
+    /* Can be anything, a good use might be a device handle for I2C or SPI */
+    uint32_t User0;
 };
 
 void SSD1306_SetMuxRatio( struct SSD1306_Device* DeviceHandle, uint8_t Ratio );
