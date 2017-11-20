@@ -214,10 +214,34 @@ void SSD1306_SetFont( struct SSD1306_Device* DeviceHandle, struct FontDef* FontH
     DeviceHandle->Font = FontHandle;
 }
 
+void SSD1306_SetColumnAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start, uint8_t End ) {
+    NullCheck( DeviceHandle, return );
+
+    CheckBounds( Start > SSD1306_Max_Col, return );
+    CheckBounds( End > SSD1306_Max_Col, return );
+
+    SSD1306_WriteCommand( DeviceHandle, SSDCmd_Set_Column_Address );
+    SSD1306_WriteCommand( DeviceHandle, Start );
+    SSD1306_WriteCommand( DeviceHandle, End );
+}
+
+void SSD1306_SetPageAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start, uint8_t End ) {
+    NullCheck( DeviceHandle, return );
+
+    CheckBounds( Start > SSD1306_Max_Row, return );
+    CheckBounds( End > SSD1306_Max_Row, return );
+
+    SSD1306_WriteCommand( DeviceHandle, SSDCmd_Set_Page_Address );
+    SSD1306_WriteCommand( DeviceHandle, Start );
+    SSD1306_WriteCommand( DeviceHandle, End );
+}
+
 static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Height ) {
     DeviceHandle->Width = Width;
     DeviceHandle->Height = Height;
     DeviceHandle->FramebufferSize = ( DeviceHandle->Width * Height ) / 8;
+
+    memset( DeviceHandle->Framebuffer, 0, DeviceHandle->FramebufferSize );
 
     /* Init sequence according to SSD1306.pdf */
     SSD1306_SetMuxRatio( DeviceHandle, 0x3F );
@@ -232,6 +256,8 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     SSD1306_SetDisplayClocks( DeviceHandle, 0, 8 );
     EnableChargePumpRegulator( DeviceHandle );
     SSD1306_SetDisplayAddressMode( DeviceHandle, AddressMode_Horizontal );
+    SSD1306_SetColumnAddress( DeviceHandle, 0, DeviceHandle->Width - 1 );
+    SSD1306_SetPageAddress( DeviceHandle, 0, ( DeviceHandle->Height / 8 ) - 1 );
     SSD1306_EnableDisplayRAM( DeviceHandle );
     SSD1306_DisplayOn( DeviceHandle );
     SSD1306_Update( DeviceHandle );

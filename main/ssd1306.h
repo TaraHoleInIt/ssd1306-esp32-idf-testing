@@ -8,6 +8,8 @@
 #include <stdbool.h>
 
 #define SSD1306_Max_Framebuffer_Size ( ( 128 * 64 ) / 8 )
+#define SSD1306_Max_Col 127
+#define SSD1306_Max_Row 7
 
 #ifndef BIT
 #define BIT( n ) ( 1 << n )
@@ -46,7 +48,9 @@ typedef enum {
     SSDCmd_Set_Display_VFlip_On = 0xC8,
     SSDCmd_Set_COM_Pin_Config = 0xDA,
     SSDCmd_Set_Display_CLK = 0xD5,
-    SSDCmd_Enable_Charge_Pump_Regulator = 0x8D
+    SSDCmd_Enable_Charge_Pump_Regulator = 0x8D,
+    SSDCmd_Set_Column_Address = 0x21,
+    SSDCmd_Set_Page_Address = 0x22
 } SSDCmd;
 
 typedef enum {
@@ -105,6 +109,9 @@ void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x
 void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y2, bool Color );
 void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, int y2, bool Color );
 void SSD1306_SetFont( struct SSD1306_Device* DeviceHandle, struct FontDef* FontHandle );
+
+void SSD1306_SetColumnAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start, uint8_t End );
+void SSD1306_SetPageAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start, uint8_t End );
 
 int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height, int I2CAddress, WriteCommandProc WriteCommand, WriteDataProc WriteData );
 
