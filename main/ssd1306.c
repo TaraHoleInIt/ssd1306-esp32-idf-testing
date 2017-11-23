@@ -15,6 +15,8 @@
 #define COM_ScanDir_LR 0
 #define COM_ScanDir_RL 1
 
+#define TraceHere( ) printf( "%s: line %d\n", __FUNCTION__, __LINE__ )
+
 static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Height );
 
 int SSD1306_WriteCommand( struct SSD1306_Device* DeviceHandle, SSDCmd SSDCommand ) {
@@ -236,6 +238,22 @@ void SSD1306_SetPageAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start,
     SSD1306_WriteCommand( DeviceHandle, End );
 }
 
+int SSD1306_HWReset( struct SSD1306_Device* DeviceHandle ) {
+    TraceHere( );
+
+    NullCheck( DeviceHandle, return 0 );
+
+    if ( DeviceHandle->Reset != NULL ) {
+        TraceHere( );
+        return ( DeviceHandle->Reset ) ( DeviceHandle );
+    }
+
+    /* This should always return true if there is no reset callback as
+     * no error would have occurred during the non existant reset.
+     */
+    return 1;
+}
+
 static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Height ) {
     DeviceHandle->Width = Width;
     DeviceHandle->Height = Height;
@@ -243,6 +261,9 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
 
     memset( DeviceHandle->Framebuffer, 0, DeviceHandle->FramebufferSize );
 
+    /* For those who have a hardware reset pin on their display */
+    SSD1306_HWReset( DeviceHandle );
+    
     /* Init sequence according to SSD1306.pdf */
     SSD1306_SetMuxRatio( DeviceHandle, 0x3F );
     SSD1306_SetDisplayOffset( DeviceHandle, 0x00 );
@@ -262,10 +283,12 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     SSD1306_DisplayOn( DeviceHandle );
     SSD1306_Update( DeviceHandle );
 
+    TraceHere( );
+
     return 1;
 }
 
-int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height, int I2CAddress, WriteCommandProc WriteCommand, WriteDataProc WriteData ) {
+int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height, int I2CAddress, uint32_t UserParam, WriteCommandProc WriteCommand, WriteDataProc WriteData, ResetProc Reset ) {
     NullCheck( DeviceHandle, return 0 );
     NullCheck( WriteCommand, return 0 );
     NullCheck( WriteData, return 0 );
@@ -274,7 +297,28 @@ int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height
 
     DeviceHandle->WriteCommand = WriteCommand;
     DeviceHandle->WriteData = WriteData;
+    DeviceHandle->Reset = Reset;
     DeviceHandle->Address = I2CAddress;
+    DeviceHandle->User0 = UserParam;
     
+    return SSD1306_Init( DeviceHandle, Width, Height );
+}
+
+int SSD1306_Init_SPI( struct SSD1306_Device* DeviceHandle, int Width, int Height, int ResetPin, int CSPin, uint32_t UserParam, WriteCommandProc WriteCommand, WriteDataProc WriteData, ResetProc Reset ) {
+    NullCheck( DeviceHandle, return 0 );
+    NullCheck( WriteCommand, return 0 );
+    NullCheck( WriteData, return 0 );
+
+    memset( DeviceHandle, 0, sizeof( struct SSD1306_Device ) );
+
+    DeviceHandle->WriteCommand = WriteCommand;
+    DeviceHandle->WriteData = WriteData;
+    DeviceHandle->Reset = Reset;
+    DeviceHandle->User0 = UserParam;
+    DeviceHandle->RSTPin = ResetPin;
+    DeviceHandle->CSPin = CSPin;
+
+    TraceHere( );
+
     return SSD1306_Init( DeviceHandle, Width, Height );
 }

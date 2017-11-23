@@ -11,6 +11,8 @@ int ESP32_WriteCommand_I2C( struct SSD1306_Device* DeviceHandle, SSDCmd SSDComma
     i2c_cmd_handle_t CommandHandle = NULL;
     esp_err_t Result = ESP_FAIL;
 
+    NullCheck( DeviceHandle, return 0 );
+
     if ( ( CommandHandle = i2c_cmd_link_create( ) ) ) {
         i2c_master_start( CommandHandle );
             i2c_master_write_byte( CommandHandle, ( DeviceHandle->Address << 1 ) | I2C_MASTER_WRITE, 1 );
@@ -28,6 +30,9 @@ int ESP32_WriteCommand_I2C( struct SSD1306_Device* DeviceHandle, SSDCmd SSDComma
 int ESP32_WriteData_I2C( struct SSD1306_Device* DeviceHandle, uint8_t* Data, size_t DataLength ) {
     i2c_cmd_handle_t CommandHandle = NULL;
     esp_err_t Result = ESP_FAIL;
+
+    NullCheck( DeviceHandle, return 0 );
+    NullCheck( Data, return 0 );
 
     if ( ( CommandHandle = i2c_cmd_link_create( ) ) ) {
         i2c_master_start( CommandHandle );

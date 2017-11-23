@@ -65,6 +65,7 @@ struct FontDef;
 
 typedef int ( *WriteCommandProc ) ( struct SSD1306_Device* DeviceHandle, SSDCmd Command );
 typedef int ( *WriteDataProc ) ( struct SSD1306_Device* DeviceHandle, uint8_t* Data, size_t DataLength );
+typedef int ( *ResetProc ) ( struct SSD1306_Device* DeviceHandle );
 
 struct SSD1306_Device {
     /* I2C Specific */
@@ -73,7 +74,6 @@ struct SSD1306_Device {
     /* SPI Specific */
     int RSTPin;
     int CSPin;
-    int DCPin;
 
     /* Everything else */
     int Width;
@@ -87,6 +87,7 @@ struct SSD1306_Device {
 
     WriteCommandProc WriteCommand;
     WriteDataProc WriteData;
+    ResetProc Reset;
 
     /* Can be anything, a good use might be a device handle for I2C or SPI */
     uint32_t User0;
@@ -116,7 +117,9 @@ void SSD1306_SetFont( struct SSD1306_Device* DeviceHandle, struct FontDef* FontH
 void SSD1306_SetColumnAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start, uint8_t End );
 void SSD1306_SetPageAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start, uint8_t End );
 
-int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height, int I2CAddress, WriteCommandProc WriteCommand, WriteDataProc WriteData );
+int SSD1306_HWReset( struct SSD1306_Device* DeviceHandle );
 
+int SSD1306_Init_I2C( struct SSD1306_Device* DeviceHandle, int Width, int Height, int I2CAddress, uint32_t UserParam, WriteCommandProc WriteCommand, WriteDataProc WriteData, ResetProc Reset );
+int SSD1306_Init_SPI( struct SSD1306_Device* DeviceHandle, int Width, int Height, int ResetPin, int CSPin, uint32_t UserParam, WriteCommandProc WriteCommand, WriteDataProc WriteData, ResetProc Reset );
 
 #endif

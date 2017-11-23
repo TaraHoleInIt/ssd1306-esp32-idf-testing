@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <esp_timer.h>
+#include <driver/spi_master.h>
 #include <driver/i2c.h>
 
 #include "ssd1306.h"
 #include "font.h"
 
 #include "iface_esp32_i2c.h"
+#include "iface_esp32_spi.h"
 
 int64_t GetMillis( void );
 
@@ -103,13 +105,22 @@ void ShiftTask( void* Param ) {
     }
 }
 
+const int MOSIPin = 23;
+const int SCKPin = 18;
+const int RSTPin = 5;
+const int DCPin = 15;
+const int CSPin = 4;
+
 void app_main( void ) {
     printf( "Ready...\n" );
 
-    if ( InitI2CMaster( 18, 19 ) ) {
-        printf( "I2C Master Init OK.\n" );
+    /*if ( InitI2CMaster( 18, 19 ) ) {*/
+    if ( ESP32_InitSPIMaster( ) ) {
+        /*printf( "I2C Master Init OK.\n" );*/
+        printf( "SPI Master Init OK.\n" );
 
-        if ( SSD1306_Init_I2C( &TestDevice, 128, 64, 0x3C, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C ) == 1 ) {
+        /*if ( SSD1306_Init_I2C( &TestDevice, 128, 64, 0x3C, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C ) == 1 ) {*/
+        if ( ESP32_AddDevice_SPI( &TestDevice, 128, 64, 4, 16 ) == 1 ) {
             printf( "SSD1306 Init OK.\n" );
 
             /* SSD1306_SetInverted( &TestDevice, true ); */
@@ -135,7 +146,7 @@ void app_main( void ) {
 
             SSD1306_Update( &TestDevice );     
 
-            xTaskCreate( ShiftTask, "ShiftTask", 4096, NULL, 5, NULL );                             
+            //xTaskCreate( ShiftTask, "ShiftTask", 4096, NULL, 5, NULL );                             
         }
     }
 }
