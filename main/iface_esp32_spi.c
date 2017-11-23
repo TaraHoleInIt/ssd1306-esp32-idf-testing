@@ -23,7 +23,7 @@
 
 static const int MOSIPin = 23;
 static const int SCKPin = 18;
-static const int DCPin = 16;
+static int DCPin = -1;
 
 int ESP32_WriteCommand_SPI( struct SSD1306_Device* DeviceHandle, SSDCmd SSDCommand ) {
     static uint8_t TempCommandByte = 0;
@@ -78,27 +78,34 @@ int ESP32_Reset_SPI( struct SSD1306_Device* DeviceHandle ) {
             vTaskDelay( pdMS_TO_TICKS( 100 ) );
         gpio_set_level( DeviceHandle->RSTPin, 1 );
 
-        return 0;
+        return 1;
     }
 
     return 0;
 }
 
-int ESP32_InitSPIMaster( void ) {
+int ESP32_InitSPIMaster( int DC ) {
     spi_bus_config_t BusConfig;
 
-    gpio_set_direction( DCPin, GPIO_MODE_OUTPUT );
-    gpio_set_level( DCPin, 0 );
+    if ( GPIO_IS_VALID_OUTPUT_GPIO( DC ) ) {
+        DCPin = DC;
 
-    memset( &BusConfig, 0, sizeof( spi_bus_config_t ) );
+        gpio_set_direction( DCPin, GPIO_MODE_OUTPUT );
+        gpio_set_level( DCPin, 0 );
 
-    BusConfig.mosi_io_num = MOSIPin;
-    BusConfig.sclk_io_num = SCKPin;
-    BusConfig.quadhd_io_num = -1;
-    BusConfig.quadwp_io_num = -1;
-    BusConfig.miso_io_num = -1;
+        memset( &BusConfig, 0, sizeof( spi_bus_config_t ) );
 
-    return spi_bus_initialize( HSPI_HOST, &BusConfig, 1 ) == ESP_OK ? 1 : 0;
+        BusConfig.mosi_io_num = MOSIPin;
+        BusConfig.sclk_io_num = SCKPin;
+        BusConfig.quadhd_io_num = -1;
+        BusConfig.quadwp_io_num = -1;
+        BusConfig.miso_io_num = -1;
+
+        return spi_bus_initialize( HSPI_HOST, &BusConfig, 1 ) == ESP_OK ? 1 : 0;
+    }
+
+    printf( "%s: DC Pin %d is not a valid output pin.\n", __FUNCTION__, DC );
+    return 0;
 }
 
 int ESP32_AddDevice_SPI( struct SSD1306_Device* DeviceHandle, int Width, int Height, int CSPin, int RSTPin ) {
@@ -106,15 +113,29 @@ int ESP32_AddDevice_SPI( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     spi_device_handle_t SPIHandle;
 
     NullCheck( DeviceHandle, return 0 );
+
+    if ( GPIO_IS_VALID_OUTPUT_GPIO( CSPin ) == 0 ) {
+        printf( "%s: CS Pin %d is not a valid output pin.\n", __FUNCTION__, CSPin );
+        return 0;
+    }
+
+    if ( RSTPin > 0 && ( GPIO_IS_VALID_OUTPUT_GPIO( RSTPin ) == 0 ) ) {
+        printf( "%s: RST Pin %d is not a valid output pin.\n", __FUNCTION__, RSTPin );
+        return 0;
+    }
+
     memset( &SPIDevice, 0, sizeof( spi_device_interface_config_t ) );
 
-    SPIDevice.clock_speed_hz = 100000; /* 100KHz */
+    SPIDevice.clock_speed_hz = 1000000; /* 100KHz */
     SPIDevice.mode = 0;
     SPIDevice.spics_io_num = CSPin;
     SPIDevice.queue_size = 100;
-
-    gpio_set_direction( RSTPin, GPIO_MODE_OUTPUT );
-    gpio_set_level( RSTPin, 0 );   /* Reset happens later and this will remain high */
+    
+    /* Reset pin is optional */
+    if ( RSTPin > 0 ) {
+        gpio_set_direction( RSTPin, GPIO_MODE_OUTPUT );
+        gpio_set_level( RSTPin, 0 );   /* Reset happens later and this will remain high */
+    }
 
     if ( spi_bus_add_device( HSPI_HOST, &SPIDevice, &SPIHandle ) == ESP_OK ) {
         printf( "Here: Device handle = 0x%08X\n", ( uint32_t ) SPIHandle );

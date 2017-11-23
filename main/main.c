@@ -112,17 +112,15 @@ void ShiftTask( void* Param ) {
     }
 }
 
-const int MOSIPin = 23;
-const int SCKPin = 18;
 const int RSTPin = 5;
-const int DCPin = 15;
+const int DCPin = 16;
 const int CSPin = 4;
 
 void app_main( void ) {
     printf( "Ready...\n" );
 
     /*if ( InitI2CMaster( 18, 19 ) ) {*/
-    if ( ESP32_InitSPIMaster( ) ) {
+    if ( ESP32_InitSPIMaster( DCPin ) ) {
         /*printf( "I2C Master Init OK.\n" );*/
         printf( "SPI Master Init OK.\n" );
 
