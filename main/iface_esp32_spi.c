@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2017 Tara Keeling
+ * 
+ * This software is released under the MIT License.
+ * https://opensource.org/licenses/MIT
+ */
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -16,7 +23,7 @@
 
 static const int MOSIPin = 23;
 static const int SCKPin = 18;
-static const int DCPin = 15;
+static const int DCPin = 16;
 
 int ESP32_WriteCommand_SPI( struct SSD1306_Device* DeviceHandle, SSDCmd SSDCommand ) {
     static uint8_t TempCommandByte = 0;

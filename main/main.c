@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2017 Tara Keeling
+ * 
+ * This software is released under the MIT License.
+ * https://opensource.org/licenses/MIT
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <esp_timer.h>
@@ -120,7 +127,7 @@ void app_main( void ) {
         printf( "SPI Master Init OK.\n" );
 
         /*if ( SSD1306_Init_I2C( &TestDevice, 128, 64, 0x3C, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C ) == 1 ) {*/
-        if ( ESP32_AddDevice_SPI( &TestDevice, 128, 64, 4, 16 ) == 1 ) {
+        if ( ESP32_AddDevice_SPI( &TestDevice, 128, 64, CSPin, RSTPin ) == 1 ) {
             printf( "SSD1306 Init OK.\n" );
 
             /* SSD1306_SetInverted( &TestDevice, true ); */
