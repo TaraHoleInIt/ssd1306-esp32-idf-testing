@@ -54,3 +54,22 @@ int ESP32_WriteData_I2C( struct SSD1306_Device* DeviceHandle, uint8_t* Data, siz
 
     return ( Result == ESP_OK ) ? 1 : 0;
 }
+
+int ESP32_InitI2CMaster( int SDA, int SCL ) {
+    i2c_config_t Config;
+
+    memset( &Config, 0, sizeof( i2c_config_t ) );
+
+    Config.mode = I2C_MODE_MASTER;
+    Config.sda_io_num = SDA;
+    Config.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    Config.scl_io_num = SCL;
+    Config.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    Config.master.clk_speed = 1000000;   // 1MHz
+
+    if ( i2c_param_config( USE_THIS_I2C_PORT, &Config ) == ESP_OK ) {
+        return i2c_driver_install( USE_THIS_I2C_PORT, Config.mode, 0, 0, 0 ) == ESP_OK ? 1 : 0;
+    }
+
+    return 0;
+}

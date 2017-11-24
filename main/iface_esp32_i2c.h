@@ -5,5 +5,6 @@
 
 int ESP32_WriteCommand_I2C( struct SSD1306_Device* DeviceHandle, SSDCmd SSDCommand );
 int ESP32_WriteData_I2C( struct SSD1306_Device* DeviceHandle, uint8_t* Data, size_t DataLength );
+int ESP32_InitI2CMaster( int SDA, int SCL );
 
 #endif

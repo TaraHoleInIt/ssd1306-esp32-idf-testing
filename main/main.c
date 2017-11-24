@@ -21,25 +21,6 @@ int64_t GetMillis( void ) {
     return esp_timer_get_time( ) / 1000;
 }
 
-int InitI2CMaster( int SDA, int SCL ) {
-    i2c_config_t Config;
-
-    memset( &Config, 0, sizeof( i2c_config_t ) );
-
-    Config.mode = I2C_MODE_MASTER;
-    Config.sda_io_num = SDA;
-    Config.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    Config.scl_io_num = SCL;
-    Config.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    Config.master.clk_speed = 1000000;   // 1MHz
-
-    if ( i2c_param_config( USE_THIS_I2C_PORT, &Config ) == ESP_OK ) {
-        return i2c_driver_install( USE_THIS_I2C_PORT, Config.mode, 0, 0, 0 ) == ESP_OK ? 1 : 0;
-    }
-
-    return 0;
-}
-
 void FBShiftLeft( struct SSD1306_Device* DeviceHandle, uint8_t* ShiftIn, uint8_t* ShiftOut ) {
     uint8_t* Framebuffer = NULL;
     int Width = 0;
@@ -95,7 +76,7 @@ struct SSD1306_Device Dev_I2C;
 void app_main( void ) {
     printf( "Ready...\n" );
 
-    if ( InitI2CMaster( SDAPin, SCLPin ) ) {
+    if ( ESP32_InitI2CMaster( SDAPin, SCLPin ) ) {
         printf( "i2c master initialized.\n" );
 
         if ( SSD1306_Init_I2C( &Dev_I2C, 128, 64, 0x3C, 0, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C, NULL ) == 1 ) {
