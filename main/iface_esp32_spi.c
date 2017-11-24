@@ -20,6 +20,7 @@
 #include "iface_esp32_spi.h"
 
 #define TraceHere( ) printf( "%s: line %d\n", __FUNCTION__, __LINE__ )
+#define MHZ( n ) ( n * 1000000 )
 
 static const int MOSIPin = 23;
 static const int SCKPin = 18;
@@ -126,7 +127,7 @@ int ESP32_AddDevice_SPI( struct SSD1306_Device* DeviceHandle, int Width, int Hei
 
     memset( &SPIDevice, 0, sizeof( spi_device_interface_config_t ) );
 
-    SPIDevice.clock_speed_hz = 1000000; /* 100KHz */
+    SPIDevice.clock_speed_hz = MHZ( 1 );
     SPIDevice.mode = 0;
     SPIDevice.spics_io_num = CSPin;
     SPIDevice.queue_size = 100;

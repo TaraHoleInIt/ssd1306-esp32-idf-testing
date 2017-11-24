@@ -17,10 +17,6 @@
 #include "iface_esp32_i2c.h"
 #include "iface_esp32_spi.h"
 
-int64_t GetMillis( void );
-
-struct SSD1306_Device TestDevice;
-
 int64_t GetMillis( void ) {
     return esp_timer_get_time( ) / 1000;
 }
@@ -87,71 +83,41 @@ void DrawPixelInColumn( uint8_t* Column, int y, bool Color ) {
     Column[ Page ] = ( Color == true ) ? Column[ Page ] | BIT( Pixel ) : Column[ Page ] & ~BIT( Pixel );
 }
 
-void ShiftTask( void* Param ) {
-    uint8_t In[ 8 ];
-    int dy = 1;
-    int y = 0;
-
-    while ( true ) {
-        memset( In, 0, sizeof( In ) );
-
-        y+= dy;
-
-        if ( y >= 63 ) {
-            dy = -1;
-        } else if ( y <= 0 ) {
-            dy = 1;
-        }
-
-        DrawPixelInColumn( In, y, true );
-
-        FBShiftLeft( &TestDevice, In, NULL );
-        SSD1306_Update( &TestDevice );
-
-        vTaskDelay( 50 / portTICK_PERIOD_MS );
-    }
-}
-
 const int RSTPin = 5;
 const int DCPin = 16;
 const int CSPin = 4;
+const int SCLPin = 22;
+const int SDAPin = 21;
+
+struct SSD1306_Device Dev_SPI;
+struct SSD1306_Device Dev_I2C; 
 
 void app_main( void ) {
     printf( "Ready...\n" );
 
-    /*if ( InitI2CMaster( 18, 19 ) ) {*/
+    if ( InitI2CMaster( SDAPin, SCLPin ) ) {
+        printf( "i2c master initialized.\n" );
+
+        if ( SSD1306_Init_I2C( &Dev_I2C, 128, 64, 0x3C, 0, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C, NULL ) == 1 ) {
+            printf( "i2c display initialized.\n" );
+            
+            SSD1306_SetFont( &Dev_I2C, &Font_Comic_Neue_25x28 );
+            FontDrawAnchoredString( &Dev_I2C, "Smile!", TextAnchor_Center, true );
+
+            SSD1306_Update( &Dev_I2C );
+        }
+    }
+
     if ( ESP32_InitSPIMaster( DCPin ) ) {
-        /*printf( "I2C Master Init OK.\n" );*/
         printf( "SPI Master Init OK.\n" );
 
-        /*if ( SSD1306_Init_I2C( &TestDevice, 128, 64, 0x3C, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C ) == 1 ) {*/
-        if ( ESP32_AddDevice_SPI( &TestDevice, 128, 64, CSPin, RSTPin ) == 1 ) {
+        if ( ESP32_AddDevice_SPI( &Dev_SPI, 128, 64, CSPin, RSTPin ) == 1 ) {
             printf( "SSD1306 Init OK.\n" );
 
-            /* SSD1306_SetInverted( &TestDevice, true ); */
-            /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Sans_15x16 ); */
-            /* SSD1306_SetFont( &TestDevice, &Font_Liberation_Serif_19x19 ); */
-            /* SSD1306_SetFont( &TestDevice, &Font_Ubuntu_Mono_6x10 ); */
-            SSD1306_SetFont( &TestDevice, &Font_Comic_Neue_25x28 );
+            SSD1306_SetFont( &Dev_SPI, &Font_Comic_Neue_25x28 );
+            FontDrawAnchoredString( &Dev_SPI, "Okay.", TextAnchor_Center, true );
 
-            /*
-            FontDrawAnchoredString( &TestDevice, "NE", TextAnchor_NorthEast, true );
-            FontDrawAnchoredString( &TestDevice, "NW", TextAnchor_NorthWest, true );
-            FontDrawAnchoredString( &TestDevice, "N", TextAnchor_North, true );
-            FontDrawAnchoredString( &TestDevice, "E", TextAnchor_East, true );
-            FontDrawAnchoredString( &TestDevice, "W", TextAnchor_West, true );
-            FontDrawAnchoredString( &TestDevice, "SE", TextAnchor_SouthEast, true );
-            FontDrawAnchoredString( &TestDevice, "SW", TextAnchor_SouthWest, true );
-            FontDrawAnchoredString( &TestDevice, "S", TextAnchor_South, true );
-            FontDrawAnchoredString( &TestDevice, "C", TextAnchor_Center, true );
-            */
-
-            FontDrawAnchoredString( &TestDevice, "Smile!", TextAnchor_North, true );
-            FontDrawAnchoredString( &TestDevice, "Okay.", TextAnchor_South, true );
-
-            SSD1306_Update( &TestDevice );     
-
-            //xTaskCreate( ShiftTask, "ShiftTask", 4096, NULL, 5, NULL );                             
+            SSD1306_Update( &Dev_SPI );                            
         }
     }
 }
