@@ -82,7 +82,6 @@ struct SSD1306_Device {
     /* Everything else */
     int Width;
     int Height;
-    int Pitch;
 
 #ifdef SSD1306_DYNAMIC_ALLOC
     uint8_t* Framebuffer;
