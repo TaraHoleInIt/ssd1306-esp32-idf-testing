@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "ssd1306.h"
 #include "font.h"
@@ -165,6 +166,7 @@ void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_
     uint8_t* FBOffset = NULL;
 
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
 
     /* 
      * We only need to modify the Y coordinate since the pitch
@@ -180,6 +182,7 @@ void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_
 
 void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, bool Color ) {
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
 
     CheckBounds( x >= DeviceHandle->Width, return );
     CheckBounds( ( x2 + x ) >= DeviceHandle->Width, return );
@@ -192,6 +195,7 @@ void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x
 
 void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y2, bool Color ) {
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
 
     CheckBounds( x >= DeviceHandle->Width, return );
     CheckBounds( y >= DeviceHandle->Height, return );
@@ -204,6 +208,7 @@ void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y
 
 void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, int y2, bool Color ) {
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
 
     CheckBounds( x >= DeviceHandle->Width, return );
     CheckBounds( ( x2 + x ) >= DeviceHandle->Width, return );
@@ -265,6 +270,11 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     DeviceHandle->Width = Width;
     DeviceHandle->Height = Height;
     DeviceHandle->FramebufferSize = ( DeviceHandle->Width * Height ) / 8;
+
+#ifdef SSD1306_DYNAMIC_ALLOC
+    DeviceHandle->Framebuffer = ( uint8_t* ) malloc( DeviceHandle->FramebufferSize );
+    NullCheck( DeviceHandle->Framebuffer, return 0 );
+#endif
 
     memset( DeviceHandle->Framebuffer, 0, DeviceHandle->FramebufferSize );
 

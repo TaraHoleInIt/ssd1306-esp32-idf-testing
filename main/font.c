@@ -58,6 +58,7 @@ void FontDrawChar( struct SSD1306_Device* DeviceHandle, char c, int x, int y, bo
     int y2 = 0;
 
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
     NullCheck( DeviceHandle->Font, return );
     NullCheck( DeviceHandle->Font->Data, return );
 
@@ -95,6 +96,7 @@ void FontDrawString( struct SSD1306_Device* DeviceHandle, const char* Text, int 
     int y2 = 0;
 
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
     NullCheck( DeviceHandle->Font, return );
     NullCheck( DeviceHandle->Font->Data, return );
     NullCheck( Text, return );
@@ -119,6 +121,7 @@ void FontDrawCharUnaligned( struct SSD1306_Device* DeviceHandle, char c, int x, 
     int i = 0;
 
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
     NullCheck( DeviceHandle->Font, return );
     NullCheck( DeviceHandle->Font->Data, return );
 
@@ -159,6 +162,7 @@ void FontDrawStringUnaligned( struct SSD1306_Device* DeviceHandle, const char* T
     int i = 0;
 
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
     NullCheck( DeviceHandle->Font, return );
     NullCheck( DeviceHandle->Font->Data, return );
     NullCheck( Text, return );
@@ -181,6 +185,7 @@ void FontDrawAnchoredString( struct SSD1306_Device* DeviceHandle, const char* Te
     int y = 0;
 
     NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
     NullCheck( DeviceHandle->Font, return );
     NullCheck( DeviceHandle->Font->Data, return );
     NullCheck( Text, return );    
