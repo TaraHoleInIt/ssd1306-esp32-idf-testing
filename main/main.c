@@ -16,6 +16,7 @@
 
 #include "iface_esp32_i2c.h"
 #include "iface_esp32_spi.h"
+#include "iface_virtual.h"
 
 int64_t GetMillis( void ) {
     return esp_timer_get_time( ) / 1000;
@@ -71,21 +72,40 @@ const int SCLPin = 22;
 const int SDAPin = 21;
 
 struct SSD1306_Device Dev_SPI;
-struct SSD1306_Device Dev_I2C; 
+struct SSD1306_Device Dev_I2C;
+struct SSD1306_Device Dev_Span;
 
 void app_main( void ) {
+    bool Screen0 = false;
+    bool Screen1 = false;
+    struct Rect SrcScreen0;
+    struct Rect SrcScreen1;
+    struct Rect ScreenSize;
+
     printf( "Ready...\n" );
+
+    ScreenSize.Left = 0;
+    ScreenSize.Right = 127;
+    ScreenSize.Top = 0;
+    ScreenSize.Bottom = 63;
 
     if ( ESP32_InitI2CMaster( SDAPin, SCLPin ) ) {
         printf( "i2c master initialized.\n" );
 
         if ( SSD1306_Init_I2C( &Dev_I2C, 128, 64, 0x3C, 0, ESP32_WriteCommand_I2C, ESP32_WriteData_I2C, NULL ) == 1 ) {
             printf( "i2c display initialized.\n" );
-            
-            SSD1306_SetFont( &Dev_I2C, &Font_Comic_Neue_25x28 );
-            FontDrawAnchoredString( &Dev_I2C, "Smile!", TextAnchor_Center, true );
 
-            SSD1306_Update( &Dev_I2C );
+            SrcScreen0.Left = 0;
+            SrcScreen0.Right = Dev_I2C.Width - 1;
+            SrcScreen0.Top = 0;
+            SrcScreen0.Bottom = Dev_I2C.Height - 1;
+
+            Screen0 = true;
+            
+            //SSD1306_SetFont( &Dev_I2C, &Font_Comic_Neue_25x28 );
+            //FontDrawAnchoredString( &Dev_I2C, "Smile!", TextAnchor_Center, true );
+
+            //SSD1306_Update( &Dev_I2C );
         }
     }
 
@@ -94,11 +114,32 @@ void app_main( void ) {
 
         if ( ESP32_AddDevice_SPI( &Dev_SPI, 128, 64, CSPin, RSTPin ) == 1 ) {
             printf( "SSD1306 Init OK.\n" );
+            Screen1 = true;
 
-            SSD1306_SetFont( &Dev_SPI, &Font_Comic_Neue_25x28 );
-            FontDrawAnchoredString( &Dev_SPI, "Okay.", TextAnchor_Center, true );
+            SrcScreen1.Left = Dev_I2C.Width;
+            SrcScreen1.Right = Dev_I2C.Width + Dev_SPI.Width - 1;
+            SrcScreen1.Top = 0;
+            SrcScreen1.Bottom = Dev_SPI.Height - 1;            
 
-            SSD1306_Update( &Dev_SPI );                            
+            //SSD1306_SetFont( &Dev_SPI, &Font_Comic_Neue_25x28 );
+            //FontDrawAnchoredString( &Dev_SPI, "Okay.", TextAnchor_Center, true );
+
+            //SSD1306_Update( &Dev_SPI );                            
+        }
+    }
+
+    if ( Screen0 == true && Screen1 == true ) {
+        if ( Virt_DeviceInit( &Dev_Span, 256, 64 ) == 1 ) {
+            printf( "Span created!\n" );
+
+            SSD1306_SetFont( &Dev_Span, &Font_Liberation_Serif_19x19 );
+            FontDrawAnchoredString( &Dev_Span, "im so bored i need 2 screens", TextAnchor_Center, true );
+
+            Virt_DeviceBlit( &Dev_Span, &Dev_I2C, &SrcScreen0, &ScreenSize );
+            Virt_DeviceBlit( &Dev_Span, &Dev_SPI, &SrcScreen1, &ScreenSize );
+
+            SSD1306_Update( &Dev_I2C );
+            SSD1306_Update( &Dev_SPI );
         }
     }
 }

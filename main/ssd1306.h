@@ -101,6 +101,13 @@ struct SSD1306_Device {
     uint32_t User0;
 };
 
+struct Rect {
+    int Left;
+    int Right;
+    int Top;
+    int Bottom;
+};
+
 void SSD1306_SetMuxRatio( struct SSD1306_Device* DeviceHandle, uint8_t Ratio );
 void SSD1306_SetDisplayOffset( struct SSD1306_Device* DeviceHandle, uint8_t Offset );
 void SSD1306_SetDisplayStartLines( struct SSD1306_Device* DeviceHandle );
