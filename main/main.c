@@ -78,18 +78,31 @@ struct SSD1306_Device Dev_Span;
 void ShiftTask( void* Param ) {
     static uint8_t In[ 8 ];
     static uint8_t Out[ 8 ];
+    int64_t Start = 0;
+    int64_t End = 0;
+    int Delay = 0;
 
     while ( true ) {
-        FBShiftLeft( &Dev_Span, In, Out );
-        memcpy( In, Out, sizeof( Out ) );
+        Start = GetMillis( );
+            FBShiftLeft( &Dev_Span, In, Out );
+            memcpy( In, Out, sizeof( Out ) );
 
-        Virt_DeviceBlit( &Dev_Span, &Dev_I2C, MakeRect( 0, 127, 0, 63 ), MakeRect( 0, 127, 0, 63 ) );
-        Virt_DeviceBlit( &Dev_Span, &Dev_SPI, MakeRect( 128, 255, 0, 63 ), MakeRect( 0, 127, 0, 63 ) );   
+            Virt_DeviceBlit( &Dev_Span, &Dev_I2C, MakeRect( 0, 127, 0, 63 ), MakeRect( 0, 127, 0, 63 ) );
+            Virt_DeviceBlit( &Dev_Span, &Dev_SPI, MakeRect( 128, 255, 0, 63 ), MakeRect( 0, 127, 0, 63 ) );   
 
-        SSD1306_Update( &Dev_I2C );
-        SSD1306_Update( &Dev_SPI );
+            SSD1306_Update( &Dev_I2C );
+            SSD1306_Update( &Dev_SPI );
+        End = GetMillis( );
 
-        vTaskDelay( pdMS_TO_TICKS( 16 ) );
+        /* Sync to 30FPS */
+        Delay = 33 - ( int ) ( End - Start );
+
+        if ( Delay <= 0 ) {
+            /* More dogs for the watch dog god */
+            Delay= 3;
+        }
+
+        vTaskDelay( pdMS_TO_TICKS( Delay ) );
     }
 }
 
