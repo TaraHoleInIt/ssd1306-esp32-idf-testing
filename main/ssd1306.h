@@ -108,6 +108,17 @@ struct Rect {
     int Bottom;
 };
 
+static inline struct Rect MakeRect( int Left, int Right, int Top, int Bottom ) {
+    struct Rect Temp;
+
+    Temp.Left = Left;
+    Temp.Right = Right;
+    Temp.Top = Top;
+    Temp.Bottom = Bottom;
+
+    return Temp;
+}
+
 void SSD1306_SetMuxRatio( struct SSD1306_Device* DeviceHandle, uint8_t Ratio );
 void SSD1306_SetDisplayOffset( struct SSD1306_Device* DeviceHandle, uint8_t Offset );
 void SSD1306_SetDisplayStartLines( struct SSD1306_Device* DeviceHandle );
