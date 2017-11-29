@@ -6,7 +6,10 @@
  */
 
 #include <stdint.h>
+#include "config.h"
 #include "font.h"
+
+#ifdef CONFIG_FONT_UBUNTU_MONO_6x10
 
 //WARNING: This Font Require X-GLCD Lib.
 //         You can not use it with MikroE GLCD Lib.
@@ -124,3 +127,5 @@ struct FontDef Font_Ubuntu_Mono_6x10 = {
     ' ',
     '\x7F'
 };
+
+#endif

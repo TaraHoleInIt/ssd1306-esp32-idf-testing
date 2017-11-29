@@ -13,7 +13,7 @@
 
 #include "ssd1306.h"
 
-#ifndef SSD1306_DYNAMIC_ALLOC
+#ifndef CONFIG_SSD1306_DYNAMIC_ALLOC
 #error "Virtual interface requires SSD1306_DYNAMIC_ALLOC"
 #endif
 

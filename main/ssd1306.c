@@ -271,7 +271,7 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     DeviceHandle->Height = Height;
     DeviceHandle->FramebufferSize = ( DeviceHandle->Width * Height ) / 8;
 
-#ifdef SSD1306_DYNAMIC_ALLOC
+#ifdef CONFIG_SSD1306_DYNAMIC_ALLOC
     DeviceHandle->Framebuffer = ( uint8_t* ) malloc( DeviceHandle->FramebufferSize );
     NullCheck( DeviceHandle->Framebuffer, return 0 );
 #endif

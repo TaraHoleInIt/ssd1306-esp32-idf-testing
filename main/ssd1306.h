@@ -7,9 +7,7 @@
 /* For booooool */
 #include <stdbool.h>
 
-#if 1
-#define SSD1306_DYNAMIC_ALLOC
-#endif
+#include "config.h"
 
 #define SSD1306_Max_Framebuffer_Size ( ( 128 * 64 ) / 8 )
 #define SSD1306_Max_Col 127
@@ -83,7 +81,7 @@ struct SSD1306_Device {
     int Width;
     int Height;
 
-#ifdef SSD1306_DYNAMIC_ALLOC
+#ifdef CONFIG_SSD1306_DYNAMIC_ALLOC
     uint8_t* Framebuffer;
 #else
     uint8_t Framebuffer[ SSD1306_Max_Framebuffer_Size ];

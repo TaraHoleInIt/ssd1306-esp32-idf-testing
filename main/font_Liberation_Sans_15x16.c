@@ -6,8 +6,10 @@
  */
 
 #include <stdint.h>
+#include "config.h"
 #include "font.h"
 
+#ifdef CONFIG_FONT_LIBERATION_SANS_15x16
 //WARNING: This Font Require X-GLCD Lib.
 //         You can not use it with MikroE GLCD Lib.
 
@@ -124,3 +126,5 @@ struct FontDef Font_Liberation_Sans_15x16 = {
     ' ',
     '\x7F'
 };
+
+#endif

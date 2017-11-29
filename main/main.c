@@ -144,9 +144,9 @@ void app_main( void ) {
         if ( Virt_DeviceInit( &Dev_Span, 256, 64 ) == 1 ) {
             printf( "Span created!\n" );
 
-            SSD1306_SetFont( &Dev_Span, &Font_Comic_Neue_25x28 );
-            FontDrawAnchoredString( &Dev_Span, "lol lmao and so on.", TextAnchor_Center, true );
- 
+            SSD1306_SetFont( &Dev_Span, &Font_Liberation_Sans_15x16 );
+            FontDrawAnchoredString( &Dev_Span, "Okay.", TextAnchor_Center, true );
+
             Virt_DeviceBlit( &Dev_Span, &Dev_I2C, MakeRect( 0, 127, 0, 63 ), MakeRect( 0, 127, 0, 63 ) );
             Virt_DeviceBlit( &Dev_Span, &Dev_SPI, MakeRect( 128, 255, 0, 63 ), MakeRect( 0, 127, 0, 63 ) );
 
