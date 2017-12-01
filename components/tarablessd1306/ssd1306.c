@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "ssd1306.h"
 #include "font.h"
@@ -159,65 +160,6 @@ void SSD1306_SetHFlip( struct SSD1306_Device* DeviceHandle, bool On ) {
 void SSD1306_SetVFlip( struct SSD1306_Device* DeviceHandle, bool On ) {
     NullCheck( DeviceHandle, return );
     SSD1306_WriteCommand( DeviceHandle, ( On == true ) ? SSDCmd_Set_Display_VFlip_On : SSDCmd_Set_Display_VFlip_Off );
-}
-
-void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_t Y, bool Color ) {
-    uint32_t YBit = ( Y & 0x07 );
-    uint8_t* FBOffset = NULL;
-
-    NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
-
-    /* 
-     * We only need to modify the Y coordinate since the pitch
-     * of the screen is the same as the width.
-     * Dividing Y by 8 gives us which row the pixel is in but not
-     * the bit position.
-     */
-    Y>>= 3;
-
-    FBOffset = DeviceHandle->Framebuffer + ( ( Y * DeviceHandle->Width ) + X );
-    *FBOffset = ( Color == true ) ? *FBOffset | BIT( YBit ) : *FBOffset & ~BIT( YBit );
-}
-
-void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, bool Color ) {
-    NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
-
-    CheckBounds( x >= DeviceHandle->Width, return );
-    CheckBounds( ( x2 + x ) >= DeviceHandle->Width, return );
-    CheckBounds( y >= DeviceHandle->Height, return );
-
-    for ( ; x <= x2; x++ ) {
-        SSD1306_DrawPixel( DeviceHandle, x, y, Color );
-    }
-}
-
-void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y2, bool Color ) {
-    NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
-
-    CheckBounds( x >= DeviceHandle->Width, return );
-    CheckBounds( y >= DeviceHandle->Height, return );
-    CheckBounds( ( y2 + y ) >= DeviceHandle->Height, return );
-
-    for ( ; y <= y2; y++ ) {
-        SSD1306_DrawPixel( DeviceHandle, x, y, Color );
-    }
-}
-
-void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, int y2, bool Color ) {
-    NullCheck( DeviceHandle, return );
-    NullCheck( DeviceHandle->Framebuffer, return );
-
-    CheckBounds( x >= DeviceHandle->Width, return );
-    CheckBounds( ( x2 + x ) >= DeviceHandle->Width, return );
-    CheckBounds( y >= DeviceHandle->Height, return );
-    CheckBounds( ( y2 + y ) >= DeviceHandle->Height, return );
-
-    for ( ; y <= y2; y++ ) {
-        SSD1306_DrawHLine( DeviceHandle, x, y, x2, Color );
-    }
 }
 
 void SSD1306_SetFont( struct SSD1306_Device* DeviceHandle, struct FontDef* FontHandle ) {

@@ -135,6 +135,7 @@ void SSD1306_WriteRawData( struct SSD1306_Device* DeviceHandle, uint8_t* Data, s
 void SSD1306_DrawPixel( struct SSD1306_Device* DeviceHandle, uint32_t X, uint32_t Y, bool Color );
 void SSD1306_DrawHLine( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, bool Color );
 void SSD1306_DrawVLine( struct SSD1306_Device* DeviceHandle, int x, int y, int y2, bool Color );
+void SSD1306_DrawLine( struct SSD1306_Device* DeviceHandle, int x0, int y0, int x1, int y1, bool Color );
 void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2, int y2, bool Color );
 void SSD1306_SetFont( struct SSD1306_Device* DeviceHandle, struct FontDef* FontHandle );
 
