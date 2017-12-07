@@ -94,3 +94,10 @@ void SSD1306_DrawRect( struct SSD1306_Device* DeviceHandle, int x, int y, int x2
         SSD1306_DrawHLine( DeviceHandle, x, y, x2, Color );
     }
 }
+
+void SSD1306_Clear( struct SSD1306_Device* DeviceHandle, bool Color ) {
+    NullCheck( DeviceHandle, return );
+    NullCheck( DeviceHandle->Framebuffer, return );
+
+    memset( DeviceHandle->Framebuffer, Color, DeviceHandle->FramebufferSize );
+}

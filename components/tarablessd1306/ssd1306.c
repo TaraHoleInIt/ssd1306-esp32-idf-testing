@@ -24,8 +24,6 @@
 #define COM_ScanDir_LR 0
 #define COM_ScanDir_RL 1
 
-#define TraceHere( ) printf( "%s: line %d\n", __FUNCTION__, __LINE__ )
-
 static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Height );
 
 int SSD1306_WriteCommand( struct SSD1306_Device* DeviceHandle, SSDCmd SSDCommand ) {
@@ -193,12 +191,9 @@ void SSD1306_SetPageAddress( struct SSD1306_Device* DeviceHandle, uint8_t Start,
 }
 
 int SSD1306_HWReset( struct SSD1306_Device* DeviceHandle ) {
-    TraceHere( );
-
     NullCheck( DeviceHandle, return 0 );
 
     if ( DeviceHandle->Reset != NULL ) {
-        TraceHere( );
         return ( DeviceHandle->Reset ) ( DeviceHandle );
     }
 
@@ -229,7 +224,13 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     SSD1306_SetDisplayStartLine( DeviceHandle, 0 );
     SSD1306_SetHFlip( DeviceHandle, false );
     SSD1306_SetVFlip( DeviceHandle, false );
-    SetCOMPinConfiguration( DeviceHandle, COM_Disable_LR_Remap, COM_Pins_Alternative, COM_ScanDir_LR );
+
+    if ( Height == 64 ) {
+        SetCOMPinConfiguration( DeviceHandle, COM_Disable_LR_Remap, COM_Pins_Alternative, COM_ScanDir_LR );
+    } else {
+        SetCOMPinConfiguration( DeviceHandle, COM_Disable_LR_Remap, COM_Pins_Sequential, COM_ScanDir_LR );
+    }
+    
     SSD1306_SetContrast( DeviceHandle, 0x7F );
     SSD1306_DisableDisplayRAM( DeviceHandle );
     SSD1306_SetInverted( DeviceHandle, false );
@@ -241,8 +242,6 @@ static int SSD1306_Init( struct SSD1306_Device* DeviceHandle, int Width, int Hei
     SSD1306_EnableDisplayRAM( DeviceHandle );
     SSD1306_DisplayOn( DeviceHandle );
     SSD1306_Update( DeviceHandle );
-
-    TraceHere( );
 
     return 1;
 }
@@ -276,8 +275,6 @@ int SSD1306_Init_SPI( struct SSD1306_Device* DeviceHandle, int Width, int Height
     DeviceHandle->User0 = UserParam;
     DeviceHandle->RSTPin = ResetPin;
     DeviceHandle->CSPin = CSPin;
-
-    TraceHere( );
 
     return SSD1306_Init( DeviceHandle, Width, Height );
 }
