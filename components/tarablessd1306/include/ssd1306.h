@@ -125,6 +125,8 @@ void SSD1306_SetContrast( struct SSD1306_Device* DeviceHandle, uint8_t Contrast 
 void SSD1306_EnableDisplayRAM( struct SSD1306_Device* DeviceHandle );
 void SSD1306_DisableDisplayRAM( struct SSD1306_Device* DeviceHandle );
 void SSD1306_SetInverted( struct SSD1306_Device* DeviceHandle, bool Inverted );
+void SSD1306_SetHFlip( struct SSD1306_Device* DeviceHandle, bool On );
+void SSD1306_SetVFlip( struct SSD1306_Device* DeviceHandle, bool On );
 void SSD1306_DisplayOn( struct SSD1306_Device* DeviceHandle );
 void SSD1306_DisplayOff( struct SSD1306_Device* DeviceHandle ); 
 void SSD1306_SetDisplayAddressMode( struct SSD1306_Device* DeviceHandle, SSD1306_AddressMode AddressMode );

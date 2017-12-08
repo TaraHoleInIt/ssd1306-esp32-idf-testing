@@ -74,10 +74,12 @@ int ESP32_WriteData_SPI( struct SSD1306_Device* DeviceHandle, uint8_t* Data, siz
 int ESP32_Reset_SPI( struct SSD1306_Device* DeviceHandle ) {
     NullCheck( DeviceHandle, return 0 );
 
-    if ( GPIO_IS_VALID_OUTPUT_GPIO( DeviceHandle->RSTPin ) ) {
+    if ( DeviceHandle->RSTPin > -1 && GPIO_IS_VALID_OUTPUT_GPIO( DeviceHandle->RSTPin ) ) {
         gpio_set_level( DeviceHandle->RSTPin, 0 );
             vTaskDelay( pdMS_TO_TICKS( 100 ) );
         gpio_set_level( DeviceHandle->RSTPin, 1 );
+
+        printf( "Done resetted\n" );
 
         return 1;
     }
